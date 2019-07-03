@@ -47,7 +47,7 @@ plot(Forces.time/60, Commanded_torque.signals.values(:,1), 'k', 'LineWidth', 0.4
 legend('Left tire torque', 'Right tire torque', 'Torque command');
 title('Vehicle output torque');
 ylabel('Torque [Nm]');
-xlabel('Time [s]');
+xlabel('Time [min]');
 set(gca, 'XTickLabel', []);
 xlim([0 8]);
 grid on;
@@ -72,15 +72,15 @@ end
 
 figure(4);
 hold on
-plot(aero_losses.time/60, aero_losses.signals.values(:,1), 'b', 'LineWidth', 1);
-plot(aero_losses.time/60, rolling_losses.signals.values(:,1), 'm', 'LineWidth', 1);
-plot(aero_losses.time/60, incline_losses.signals.values(:,1), 'r', 'LineWidth', 0.7);
-plot(aero_losses.time/60, speeds.signals.values(:,1), 'k', 'LineWidth', 1.2);
-legend('Aero losses', 'Rolling resitance losses','Incline losses','Vehicle speed');
+plot(aero_losses.time/60, aero_losses.signals.values(:,1), 'b', 'LineWidth', 0.7);
+plot(rolling_losses.time/60, rolling_losses.signals.values(:,1), 'm', 'LineWidth', 0.7);
+plot(incline_losses.time/60, incline_losses.signals.values(:,1), 'k', 'LineWidth', 0.7);
+%plot(speeds.time/60, speeds.signals.values(:,1), 'k', 'LineWidth', 0.7);
+legend('Aero losses', 'Rolling resitance losses','Incline losses');
 title('Power losses due to the environment');
-ylabel('Power [kW]');
-xlabel('Time [s]');
-set(gca, 'XTickLabel', []);
+ylabel('Power [W]');
+xlabel('Time [min]');
+%set(gca, 'XTickLabel', []);
 xlim([0 8]);
 grid on;
 if save==1
@@ -96,7 +96,7 @@ plot(dcdc_losses.time/60, inverter_losses.signals.values(:,1), 'm', 'LineWidth',
 plot(dcdc_losses.time/60, dcdc_losses.signals.values(:,1), 'r', 'LineWidth', 0.5);
 title('Drivetrain losses');
 legend ('Motor losses','Gearbox losses','Inverter losses','DcDc losses');
-ylabel('Power losses [kW]');
+ylabel('Power losses [W]');
 xlabel('Time [min]');
 xlim([0 8]);
 grid on;
@@ -127,9 +127,10 @@ hold on;
 x=1:10:1200;
 y=23700./x;
 plot(x,y);
-axis([0 1200 0 350]);
+axis([0 1200 0 400]);
 contour(motoreff_w, motoreff_T, motoreff);
-plot(speeds.signals.values(:,2)/rw*gratio, Forces.signals.values(:,1)*rw/gratio,'k', 'LineWidth', 1);
+plot(wr.signals.values(:,1), Left_torque.signals.values(:,1),'k', 'LineWidth', 1);
+plot(wr.signals.values(:,1), Right_torque.signals.values(:,1),'r', 'LineWidth', 1);
 title('Motor efficency');
 xlabel('Motor Angular Speed [rad/s]');
 ylabel('Motor Torque [Nm]');
@@ -141,8 +142,8 @@ end
 
 figure(8);
 hold on;
-plot(Right_torque.time/60, Right_torque.signals.values(:,1), 'b', 'LineWidth', 0.7);
-plot(Right_torque.time/60, Left_torque.signals.values(:,1), 'r', 'LineWidth', 0.7);
+plot(tv_R.time/60, tv_R.signals.values(:,1), 'b', 'LineWidth', 0.7);
+plot(tv_L.time/60, tv_L.signals.values(:,1), 'r', 'LineWidth', 0.7);
 plot(Right_torque.time/60, Commanded_torque.signals.values(:,1), 'k', 'LineWidth', 0.7);
 legend('Right motor torque', 'Left motor torque','Torque command');
 title('Motor torque outputs');
@@ -188,7 +189,7 @@ else
 end
 
 figure(11);
-plot(dist.signals.values(:,1), slope.signals.values(:,1), 'b', 'LineWidth', 1.5);
+plot(dist.signals.values(:,1), slope.signals.values(:,1), 'r', 'LineWidth', 1);
 legend('Slope');
 title('Slope profile');
 ylabel('Slope [%]');
@@ -203,13 +204,13 @@ end
 
  figure(12);
  hold on;
- plot(steering_angle.time/60, steering_angle.signals.values(:,1), 'b', 'LineWidth', 0.7);
- plot(tv_right.time/60, tv_right.signals.values(:,1),'r','LineWidth', 0.7);
+ plot(steering_angle.time/60, steering_angle.signals.values(:,1), 'k', 'LineWidth', 0.7);
+ plot(tv_right.time/60, tv_right.signals.values(:,1),'b','LineWidth', 1.7);
  plot(tv_left.time/60,tv_left.signals.values(:,1),'r','LineWidth', 0.7);
- legend('Steering input','Right torque output', 'Left torque output');
  xlim([0 8]);
+ legend('Steering input','Right torque output', 'Left torque output');
  title('Lateral torque vectoring output');
-% ylim([-0.5 0.5]);
+ xlim([4 8]);
  ylabel('Torque [Nm]');
  xlabel('time [min]');
  grid on;
@@ -220,7 +221,7 @@ end
 
 figure (13);
 hold on;
-plot(dist.signals.values(:,1), E.signals.values(:,1), 'r', 'LineWidth', 0.8);
+plot(dist.signals.values(:,1), E_batt.signals.values(:,1), 'r', 'LineWidth', 0.8);
 plot(dist.signals.values(:,1), energy_regen.signals.values(:,1), 'b', 'LineWidth', 0.8);
 legend('Energy used','Regen energy');
 title('Consumed energy vs distance travelled');

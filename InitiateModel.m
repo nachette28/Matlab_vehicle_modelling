@@ -141,31 +141,32 @@ Vbat=cell_series*3.7;                                           %battery pack no
         
                                             
         cells_weight=(batt_cells*0.069);
-        batt_weight=cells_weight*1.5;                           %battery pack weight asumming each cell weights 69g
+        batt_weight=cells_weight*1.5;                           %battery pack weight asumming each cell weights 69g nad a factor 
+                                                                %of 1.5 to account for the packs auxiliary elements such as nikel 
+                                                                %strips and batthery charge controllers
         max_curr=cell_max_curr*cells_parallel ;                 %max battery output current assuming peack discharge of 15A
         nom_curr=cell_nom_curr*cells_parallel ;                 %nominal battery output current assuming peack discharge of 10A
         max_batt_pwr=max_curr*batt_nom_v*1e-3;                  %maximum battery power output in kW
         batt_pwr=nom_curr*batt_nom_v*1e-3;                      %nominal battery power output
 
         %% Inverter parameters
-        inv_eff=0.98;
-        regen_eff=0.8;
+        inv_eff=0.96;
+        regen_eff=0.75;
 
 %% Electric Motor Parameters
-load MotorEff;                                                          % Electric Motor Efficiency Data
-Ke = 0.607;                                                             % Torque Constant [Nm/A]
-Pe_max = 160e3;                                                         % Maximum Motor Power [W]
-Vbase = 14.30;                                                          % Base speed [m/s]
-Te_max_electric = Pe_max*rw/g_rat_electric/Vbase;                       % Maximum motor torque electric[Nm]
-Fv_max_electric = Te_max_electric*g_rat_electric/rw;                    % Maximum vehicle tractive force electric[N]
-Fv_max = 2*Fv_max_electric;                                             % Maximum vehicle tractive force[N]
-Te_max = 2*Te_max_electric;                                             % Maximum motor torque [Nm]
-Br_th=0.3*Fv_max_electric;                                              % Brake thersshols expressed as a percentage of Fv_max_electric 
+load MotorEff;                              % Electric Motor Efficiency Data
+Ke = 0.607;                                 % Torque Constant [Nm/A] (slope of the torque / current curve of the motor)
+Pe_max = 120e3;                             % Maximum Motor Power [W]
+Wbase = 400;                                % Electric motor base speed [rad/s]
+Te_max = Pe_max/Wbase;    % Maximum motor torque [Nm]
+Fv_max = Te_max*gratio/rw;          % Maximum vehicle tractive force[N]
+
+%Br_th=0.3*Fv_max_electric;                  % Brake thersshols expressed as a percentage of Fv_max_electric (UNIMPEMENTED)
              
 
 %% Calculates the total mass of the vehicel given previous inputs  
 base_weight = 1100;                                     %weight of the base vehicle chasis witchout powertrain
-M_weight=140;                                           %wheig for each added motor in kg (tesla motor taken as reference)
+M_weight=140;                                           %weight for each added motor in kg (tesla motor taken as reference)
 motor_weight = M_weight*(rear_motor+front_motor);       %calculates the total weight of all motors existent in the vehicle
 Mv = (base_weight+batt_weight+motor_weight);            %calculates the total vehicle weight used for the dynamic equations
 
@@ -191,7 +192,7 @@ Mv = (base_weight+batt_weight+motor_weight);            %calculates the total ve
             disp (Y)
             disp (Z)
         elseif (front_motor == 1 || front_motor == 2) && (rear_motor == 1 || rear_motor == 2) 
-            weight_dist=0.45;                        %weight ratio for the rear axle
+            weight_dist=0.45;                        % Vehicles weight distribution fore-aft (0-1)
             Fz_tire = (Mv * weight_dist * 0.5)*9.81   ;           %calculates vertical force acting on an individual tire
             X=['Individual tire force is ',num2str(Fz_tire), ' N'] ;
             Y=['Vehicle weight is ',num2str(Mv),' kg, with a battery Capacity of ',num2str(batt_cap*1e3), ' Wh'];
@@ -215,8 +216,7 @@ opt_slip=0.18;    %optimum tire slip ratio
 Tv_gain=800;
 
 %% Vehicle physical parameters
-Mv = 1420;                  % Vehicle curb weight + 120 kg passenger and carg0
-W_d = 0.5;                  % Vehicles weight distribution fore-aft (0-1)
+
 Cd = 0.26;                  % Coefficient of Drag	    
 Cr = 0.01;                  % Coefficient of Friction   
 Av = 2.75;                  % Front area [m^2]
